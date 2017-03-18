@@ -1,5 +1,6 @@
 require 'pry'
 require 'benchmark'
+
 # Bubble Sort
 
 # loop through all elements of "collection" until empty
@@ -10,11 +11,9 @@ require 'benchmark'
 # make collection equal to temp_collection
 
 def bubble_sort_slice(set)
-
   sorted = []
 
   until set.empty?
-    
     temp = []
 
     until set.length == 1
@@ -23,37 +22,32 @@ def bubble_sort_slice(set)
 
     sorted.unshift(set[0])
     set = temp
-  
   end
 
   sorted
-
 end
 
-def bubble_sort_inplace(set)
+# loop until start of set (j)
+  # starting at set[0] loop until end of set (i)
+    # if set i > set i+1 swap
+    # step i
+  # step back j
 
+def bubble_sort_inplace(set)
   j = set.length
 
   until j == 0
-
     i = 0
 
-    until i == set.length - 1
-      
-      if set[i] >= set[i+1]
-         set[i], set[i+1] = set[i+1], set[i]
-      end
-
+    until i+1 == set.length
+      set[i], set[i+1] = set[i+1], set[i] if set[i] >= set[i+1]
       i+=1
-
     end
 
     j-=1
-
   end
 
   set
-
 end
 
 # Insertion Sort
@@ -66,30 +60,24 @@ end
   #remove first element from set
 
 def insertion_sort(set)
-
   sorted = []
 
   until set.empty?
-
     i = 0
     
-    while true
-
+    loop do
       if sorted.empty? || i == sorted.length || set[0] <= sorted[i]
         sorted.insert(i, set[0])
         break
       end
 
       i+=1
-
     end
 
     set.shift
-
   end
 
   sorted
-
 end
 
 def merge_sort(set)
