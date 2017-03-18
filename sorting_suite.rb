@@ -32,6 +32,28 @@ end
 
 def bubble_sort_inplace(set)
 
+  j = set.length
+
+  until j == 0
+
+    i = 0
+
+    until i == set.length - 1
+      
+      if set[i] >= set[i+1]
+         set[i], set[i+1] = set[i+1], set[i]
+      end
+
+      i+=1
+
+    end
+
+    j-=1
+
+  end
+
+  set
+
 end
 
 # Insertion Sort
@@ -52,7 +74,7 @@ def insertion_sort(set)
     i = 0
     
     while true
-      
+
       if sorted.empty? || i == sorted.length || set[0] <= sorted[i]
         sorted.insert(i, set[0])
         break
@@ -76,17 +98,17 @@ end
 to_sort = []
 10.times { to_sort << rand(0..10) }
 
-print to_sort; puts ""
+print to_sort; puts "\n\n"
 
-bubble_sorted = []
+bubble_sorted_slice = []
+bubble_sorted_inplace = []
 insertion_sorted = []
 
 Benchmark.bm(30) do |bm|
-  bm.report('Bubble Sort') { bubble_sorted = bubble_sort_slice(Array.new(to_sort)) }
-  print bubble_sorted; puts ""
+  bm.report('Bubble Sort Slice') { bubble_sorted_slice = bubble_sort_slice(Array.new(to_sort)) }
+  print bubble_sorted_slice; puts ""
+  bm.report('Bubble Sort Inplace') { bubble_sorted_inplace = bubble_sort_inplace(Array.new(to_sort)) }
+  print bubble_sorted_inplace; puts ""
   bm.report('Insertion Sort') { insertion_sorted = insertion_sort(Array.new(to_sort)) }
   print insertion_sorted; puts ""
 end
-
-
-
