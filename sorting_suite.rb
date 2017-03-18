@@ -80,18 +80,55 @@ def insertion_sort(set)
   sorted
 end
 
+# Merge Sort
+
+# break set into atom state
+
 def merge_sort(set)
+
+  atomize([set])
+
+end
+
+def atomize(sets)
+
+  until atomized?(sets)
+
+    sets.map! { |set| set.length > 2 ? split(set) : [set] }
+    sets.flatten!(1)
+
+    binding.pry
+
+  end
+
+  sets
+end
+
+def atomized?(sets)
+
+  sets.each { |set| return false if set.length > 2 }
+
+  true
+
+end
+
+def split(set)
+
+  [set.slice!(0, set.length/2), set]
+
 end
 
 to_sort = []
-10.times { to_sort << rand(0..10) }
+16.times { to_sort << rand(0..10) }
 
 print to_sort; puts "\n\n"
 
 bubble_sorted_slice = []
 bubble_sorted_inplace = []
 insertion_sorted = []
+merge_sorted = []
 
+=begin
 Benchmark.bm(30) do |bm|
   bm.report('Bubble Sort Slice') { bubble_sorted_slice = bubble_sort_slice(Array.new(to_sort)) }
   print bubble_sorted_slice; puts ""
@@ -99,4 +136,6 @@ Benchmark.bm(30) do |bm|
   print bubble_sorted_inplace; puts ""
   bm.report('Insertion Sort') { insertion_sorted = insertion_sort(Array.new(to_sort)) }
   print insertion_sorted; puts ""
-end
+=end
+
+print merge_sort(Array.new(to_sort))
