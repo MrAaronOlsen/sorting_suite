@@ -82,88 +82,36 @@ end
 
 # Merge Sort
 
-# break set into atom state
-  # compare each pair and sort
-    # merge each pair by comparing 1st in each
-
-# I totaly don't get this and I need to study more into recursive loops
-
-def merge_sort(set)
-
-  pairs = atomize([set])
-  pairs.map! { |pair| (pair.length > 1) ? sort(pair) : pair }
-
-  until pairs.length == 1
-    binding.pry
-    pairs << merge(pairs.slice!(0), pairs.slice!(pairs.length))
-  end
-
-  pairs.flatten
-
-end
-
-def merge(set1, set2)
-
-  merged = []
-
-  checker = set1[0]
-    
-  until set1.empty? || set2.empty?
-    
-    binding.pry
-    if checker >= set2[0]
-      merged << set2.slice!(0)
-    else 
-      merged << set1.slice!(0)
-      checker = set2[0]
-    end
-    binding.pry
-  end
-
-  binding.pry
-  unless set1.empty? then merged << set1.each { |num| num } end
-  unless set2.empty? then merged << set2.each { |num| num } end
-  binding.pry
-
-  merged.flatten
-
-end
-
-def sort(pair)
-
-  pair[0] >= pair[1] ? swap(pair) : pair
-
-end
-
-def swap(pair)
-
-  pair[0], pair[1] = pair[1], pair[0]
-
-end
-
-def atomize(sets)
-
-  until atomized?(sets)
-
-    sets.map! { |set| set.length > 2 ? split(set) : [set] }
-
-  end
-
-  sets
-end
-
-def atomized?(sets)
-
-  sets.each { |set| return false if set.length > 2 }
-
-  true
-
-end
+# Split set in half in "split" method
+  # Recursive: Send each half back to "split" from within until half holds only 1 or 0 element
+  # Then stop recursion by sending back that element which will allow "split" to step forward to...
+  # Recursive: Send other half to "split" until it holds only 1 or 0 element then step forward to...
+    # First half and second half are sent to "merge" function
+    # If one half is empty, return other half (ends recursion)
+    # Otherwise compare first elements of both halves
+    # Recursive: depending on comparison send rest of set with other half back to merge and add it to first element
+      # When one half is empty recursion ends by sending back other half, which will eventually be the whole set
+# I think I get it...
 
 def split(set)
+  return set if set.length <= 1
 
-  [set.slice!(0, set.length/2), set]
+  middle = set.length/2
 
+  binding.pry
+  first_half = split(set[0..middle-1])
+  second_half = split(set[middle..set.length-1])
+  merge(first_half, second_half)
+
+end
+
+def merge(first_half, second_half)
+  return second_half if first_half.empty?
+  return first_half if second_half.empty?
+
+  puts "First:#{first_half} | Second:#{second_half}"
+  first_half+second_half
+  
 end
 
 to_sort = []
@@ -186,5 +134,4 @@ Benchmark.bm(30) do |bm|
   print insertion_sorted; puts ""
 =end
 
-merge_sorted = merge_sort(Array.new(to_sort))
-print merge_sorted; puts ""
+split(Array.new(to_sort))
