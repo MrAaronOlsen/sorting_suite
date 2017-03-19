@@ -92,30 +92,38 @@ end
     # Recursive: depending on comparison send rest of set with other half back to merge and add it to first element
       # When one half is empty recursion ends by sending back other half, which will eventually be the whole set
 # I think I get it...
+# I just spent an hour debugging because I forgot a <=... BUT IT WORKS!
 
 def split(set)
-  return set if set.length <= 1
-
-  middle = set.length/2
-
   binding.pry
-  first_half = split(set[0..middle-1])
-  second_half = split(set[middle..set.length-1])
-  merge(first_half, second_half)
-
+  if set.length <= 1
+    set
+  else
+    middle = set.length/2
+    first_half = split(set.slice(0, middle))
+    second_half = split(set.slice(middle, set.length))
+    binding.pry
+    merge(first_half, second_half)
+  end
 end
 
 def merge(first_half, second_half)
-  return second_half if first_half.empty?
-  return first_half if second_half.empty?
-
-  puts "First:#{first_half} | Second:#{second_half}"
-  first_half+second_half
-  
+  binding.pry
+  if first_half.empty?
+    second_half
+  elsif second_half.empty?
+    first_half
+  elsif first_half.first <= second_half.first
+    binding.pry
+    [first_half.first] + merge(first_half.slice(1, first_half.length), second_half)
+  elsif second_half.first <= first_half.first
+    binding.pry
+    [second_half.first] + merge(second_half.slice(1, second_half.length), first_half)
+  end
 end
 
 to_sort = []
-6.times { to_sort << rand(0..10) }
+4.times { to_sort << rand(0..10) }
 
 print to_sort; puts "\n\n"
 
@@ -134,4 +142,4 @@ Benchmark.bm(30) do |bm|
   print insertion_sorted; puts ""
 =end
 
-split(Array.new(to_sort))
+print split(Array.new(to_sort))
