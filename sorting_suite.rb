@@ -83,10 +83,61 @@ end
 # Merge Sort
 
 # break set into atom state
+  # compare each pair and sort
+    # merge each pair by comparing 1st in each
+
+# I totaly don't get this and I need to study more into recursive loops
 
 def merge_sort(set)
 
-  atomize([set])
+  pairs = atomize([set])
+  pairs.map! { |pair| (pair.length > 1) ? sort(pair) : pair }
+
+  until pairs.length == 1
+    binding.pry
+    pairs << merge(pairs.slice!(0), pairs.slice!(pairs.length))
+  end
+
+  pairs.flatten
+
+end
+
+def merge(set1, set2)
+
+  merged = []
+
+  checker = set1[0]
+    
+  until set1.empty? || set2.empty?
+    
+    binding.pry
+    if checker >= set2[0]
+      merged << set2.slice!(0)
+    else 
+      merged << set1.slice!(0)
+      checker = set2[0]
+    end
+    binding.pry
+  end
+
+  binding.pry
+  unless set1.empty? then merged << set1.each { |num| num } end
+  unless set2.empty? then merged << set2.each { |num| num } end
+  binding.pry
+
+  merged.flatten
+
+end
+
+def sort(pair)
+
+  pair[0] >= pair[1] ? swap(pair) : pair
+
+end
+
+def swap(pair)
+
+  pair[0], pair[1] = pair[1], pair[0]
 
 end
 
@@ -95,9 +146,6 @@ def atomize(sets)
   until atomized?(sets)
 
     sets.map! { |set| set.length > 2 ? split(set) : [set] }
-    sets.flatten!(1)
-
-    binding.pry
 
   end
 
@@ -119,7 +167,7 @@ def split(set)
 end
 
 to_sort = []
-16.times { to_sort << rand(0..10) }
+6.times { to_sort << rand(0..10) }
 
 print to_sort; puts "\n\n"
 
@@ -138,4 +186,5 @@ Benchmark.bm(30) do |bm|
   print insertion_sorted; puts ""
 =end
 
-print merge_sort(Array.new(to_sort))
+merge_sorted = merge_sort(Array.new(to_sort))
+print merge_sorted; puts ""
