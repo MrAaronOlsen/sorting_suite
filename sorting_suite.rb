@@ -40,29 +40,29 @@ end
 
 class InsertionSortStable
 
-  attr_reader :set, :copy, :sorted
+  attr_reader :set, :sorted
 
   def initialize(set)
     @set = set
-    @copy = Array.new(set)
     @sorted = []
   end
 
   def sort
+    j = 0
 
     until sorted.length == set.length
       i = 0
       
       loop do
-        if sorted.empty? || i == sorted.length || copy[0] <= sorted[i]
-          sorted.insert(i, copy[0])
+        if sorted.empty? || i == sorted.length || set[j] <= sorted[i]
+          sorted.insert(i, set[j])
           break
         end
 
         i+=1
       end
 
-      copy.shift
+      j+=1
     end
   end
 end
@@ -159,6 +159,7 @@ Benchmark.bm(25) do |bm|
   bm.report('Bubble Sort') { bubble_sorted.sort }
   print bubble_sorted.set; puts""
   bm.report('Insertion Sort Stable') { insertion_sorted_stable.sort }
+  puts "Set == To Sort: #{insertion_sorted_stable.set == chars_to_sort}"
   print insertion_sorted_stable.sorted; puts""
   bm.report('Insertion Sort Inplace') { insertion_sorted_inplace.sort }
   print insertion_sorted_inplace.set; puts""
@@ -183,7 +184,7 @@ Benchmark.bm(25) do |bm|
   bm.report('Bubble Sort') { bubble_sorted.sort }
   print bubble_sorted.set; puts""
   bm.report('Insertion Sort Stable') { insertion_sorted_stable.sort }
-  print insertion_sorted_stable.set; puts""
+  puts "Set == To Sort: #{insertion_sorted_stable.set == nums_to_sort}"
   print insertion_sorted_stable.sorted; puts""
   bm.report('Insertion Sort Inplace') { insertion_sorted_inplace.sort }
   print insertion_sorted_inplace.set; puts""
