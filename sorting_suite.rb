@@ -1,143 +1,176 @@
+# Sorting Suite
+
 require 'pry'
 require 'benchmark'
 
-# Bubble Sort
+class String # This is so cool! Dangerous I think, but cool
 
-# loop through all elements of "collection" until empty
-  # starting at index i compare i to i+1 until length is 1
-    # if i >= i+1 move i+1 to "temp_collection" and delete from "collection"
-    # if i < i+1 move i to "temp_collection" and delete from "collection"
-  # move last element to beginning of sorted array
-# make collection equal to temp_collection
+  def plus(array)
+    [self]+array
+  end  
 
-def bubble_sort_slice(set)
-  sorted = []
-
-  until set.empty?
-    temp = []
-
-    until set.length == 1
-      set[0] >= set[1] ? temp << set.slice!(1) : temp << set.slice!(0)
-    end
-
-    sorted.unshift(set[0])
-    set = temp
-  end
-
-  sorted
 end
 
-# loop until start of set (j)
-  # starting at set[0] loop until end of set (i)
-    # if set i > set i+1 swap
-    # step i
-  # step back j
+class Fixnum # Added this so merge sort can do both nums and chars. Fun, but totaly not needed.
 
-def bubble_sort_inplace(set)
-  j = set.length
-
-  until j == 0
-    i = 0
-
-    until i+1 == set.length
-      set[i], set[i+1] = set[i+1], set[i] if set[i] >= set[i+1]
-      i+=1
-    end
-
-    j-=1
+  def plus(array)
+    [self]+array
   end
 
-  set
 end
 
-# Insertion Sort
+class Array # What I think unshift should be called!
 
-# loop through set until empty
-# set index to 0
-  # loop through sorted_set until break or end of sorted set
-    # if first element in set is less than element at index insert element before index
-    # otherwise add 1 to index
-  #remove first element from set
+  def promote(string)
+    self.unshift(string)
+  end
 
-def insertion_sort(set)
-  sorted = []
+end
 
-  until set.empty?
-    i = 0
+class BubbleSort
     
-    loop do
-      if sorted.empty? || i == sorted.length || set[0] <= sorted[i]
-        sorted.insert(i, set[0])
-        break
+  attr_reader :set
+
+  def initialize(set)
+    @set = set
+  end
+
+  def sort
+
+    j = set.length
+
+    until j == 0
+      
+      i = 0
+
+      until i+1 == set.length
+        swap(i) if set[i] >= set[i+1]
+        i+=1
       end
 
-      i+=1
+      j-=1
+    end
+  end
+
+  def swap(i)
+    set[i], set[i+1] = set[i+1], set[i]
+  end
+
+end
+
+class InsertionSort
+
+  attr_reader :set
+
+  def initialize(set)
+    @set = set
+  end
+
+  def sort
+    sorted = []
+
+    until set.empty?
+      i = 0
+      
+      loop do
+        if sorted.empty? || i == sorted.length || set[0] <= sorted[i]
+          sorted.insert(i, set[0])
+          break
+        end
+
+        i+=1
+      end
+
+      set.shift
     end
 
-    set.shift
-  end
-
-  sorted
-end
-
-# Merge Sort
-
-# Split set in half in "split" method
-  # Recursive: Send each half back to "split" from within until half holds only 1 or 0 element
-  # Then stop recursion by sending back that element which will allow "split" to step forward to...
-  # Recursive: Send other half to "split" until it holds only 1 or 0 element then step forward to...
-    # First half and second half are sent to "merge" function
-    # If one half is empty, return other half (ends recursion)
-    # Otherwise compare first elements of both halves
-    # Recursive: depending on comparison send rest of set with other half back to merge and add it to first element
-      # When one half is empty recursion ends by sending back other half, which will eventually be the whole set
-# I think I get it...
-# I just spent an hour debugging because I forgot a <=... BUT IT WORKS!
-
-def merge_sort(set)
-  split(set)
-end
-
-def split(set)
-  if set.length <= 1
-    set
-  else
-    middle = set.length/2
-    front = split(set.take(middle))
-    back = split(set.drop(middle))
-    merge(front, back)
+    @set = sorted
   end
 end
 
-def merge(front, back)
-  if front.empty?
-    back
-  elsif back.empty?
-    front
-  elsif front.first <= back.first
-    merge(front.drop(1), back).unshift(front.first)
-  elsif back.first <= front.first
-    merge(back.drop(1), front).unshift(back.first)
+class MergeSort
+
+  attr_reader :set
+
+  def initialize(set)
+    @set = set
   end
+
+  def sort
+    @set = split(set)
+  end
+
+  def split(set)
+    if set.length <= 1
+      set
+    else
+      middle = set.length/2
+      front = split(set.take(middle))
+      back = split(set.drop(middle))
+      merge(front, back)
+    end
+  end
+
+  def merge(front, back)
+    if front.empty?
+      back
+    elsif back.empty?
+      front
+    elsif front.first <= back.first
+      #front.first.plus(merge(front.drop(1), back))      # Just playing with around with syntax here
+      merge(front.drop(1), back).unshift(front.first)
+      #[front.first] + merge(front.drop(1), back)         # Probably the best way
+    elsif back.first <= front.first
+      #back.first.plus(merge(back.drop(1), front))
+      merge(back.drop(1), front).unshift(back.first)
+      #[back.first] + merge(back.drop(1), front)
+    end
+  end
+
 end
 
-to_sort = []
-bubble_sorted_slice = []
-bubble_sorted_inplace = []
-insertion_sorted = []
-merge_sorted = []
+# Test Proofs and Benchmarks
+# Sorting Characters
 
-10.times { to_sort << ("a".."z").to_a.sample }
+set_size = 20
 
-print to_sort; puts ""
+chars_to_sort = []
+set_size.times { chars_to_sort << ("a".."z").to_a.sample }
 
-Benchmark.bm(30) do |bm|
-  bm.report('Bubble Sort Slice') { bubble_sorted_slice = bubble_sort_slice(Array.new(to_sort)) }
-  print bubble_sorted_slice; puts ""
-  bm.report('Bubble Sort Inplace') { bubble_sorted_inplace = bubble_sort_inplace(Array.new(to_sort)) }
-  print bubble_sorted_inplace; puts ""
-  bm.report('Insertion Sort') { insertion_sorted = insertion_sort(Array.new(to_sort)) }
-  print insertion_sorted; puts ""
-  bm.report('Merge Sort') { merge_sorted = merge_sort(Array.new(to_sort)) }
-  print merge_sorted; puts ""
+puts "\nCharacters To Sort"
+#print chars_to_sort; puts"\n\n"
+
+bubble_sorted = BubbleSort.new(Array.new(chars_to_sort))
+insertion_sorted = InsertionSort.new(Array.new(chars_to_sort))
+merge_sorted = MergeSort.new(Array.new(chars_to_sort))
+
+Benchmark.bm(20) do |bm|
+  bm.report('Bubble Sort') { bubble_sorted.sort }
+  #print bubble_sorted.set; puts""
+  bm.report('Insertion Sort') { insertion_sorted.sort }
+  #print insertion_sorted.set; puts""
+  bm.report('Merge Sort') { merge_sorted.sort }
+  #print merge_sorted.set; puts""
 end
+
+# Sorting Numbers
+
+nums_to_sort = []
+set_size.times { nums_to_sort << rand(0..100) }
+
+puts "\n\nNumbers To Sort"
+#print nums_to_sort; puts"\n\n"
+
+bubble_sorted = BubbleSort.new(Array.new(nums_to_sort))
+insertion_sorted = InsertionSort.new(Array.new(nums_to_sort))
+merge_sorted = MergeSort.new(Array.new(nums_to_sort))
+
+Benchmark.bm(20) do |bm|
+  bm.report('Bubble Sort') { bubble_sorted.sort }
+  #print bubble_sorted.set; puts""
+  bm.report('Insertion Sort') { insertion_sorted.sort }
+  #print insertion_sorted.set; puts""
+  bm.report('Merge Sort') { merge_sorted.sort }
+  #print merge_sorted.set; puts""
+end
+
