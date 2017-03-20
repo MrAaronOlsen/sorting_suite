@@ -94,45 +94,43 @@ end
 # I think I get it...
 # I just spent an hour debugging because I forgot a <=... BUT IT WORKS!
 
+def merge_sort(set)
+  split(set)
+end
+
 def split(set)
-  binding.pry
   if set.length <= 1
     set
   else
     middle = set.length/2
-    first_half = split(set.slice(0, middle))
-    second_half = split(set.slice(middle, set.length))
-    binding.pry
-    merge(first_half, second_half)
+    front = split(set.take(middle))
+    back = split(set.drop(middle))
+    merge(front, back)
   end
 end
 
-def merge(first_half, second_half)
-  binding.pry
-  if first_half.empty?
-    second_half
-  elsif second_half.empty?
-    first_half
-  elsif first_half.first <= second_half.first
-    binding.pry
-    [first_half.first] + merge(first_half.slice(1, first_half.length), second_half)
-  elsif second_half.first <= first_half.first
-    binding.pry
-    [second_half.first] + merge(second_half.slice(1, second_half.length), first_half)
+def merge(front, back)
+  if front.empty?
+    back
+  elsif back.empty?
+    front
+  elsif front.first <= back.first
+    merge(front.drop(1), back).unshift(front.first)
+  elsif back.first <= front.first
+    merge(back.drop(1), front).unshift(back.first)
   end
 end
 
 to_sort = []
-4.times { to_sort << rand(0..10) }
-
-print to_sort; puts "\n\n"
-
 bubble_sorted_slice = []
 bubble_sorted_inplace = []
 insertion_sorted = []
 merge_sorted = []
 
-=begin
+10.times { to_sort << ("a".."z").to_a.sample }
+
+print to_sort; puts ""
+
 Benchmark.bm(30) do |bm|
   bm.report('Bubble Sort Slice') { bubble_sorted_slice = bubble_sort_slice(Array.new(to_sort)) }
   print bubble_sorted_slice; puts ""
@@ -140,6 +138,6 @@ Benchmark.bm(30) do |bm|
   print bubble_sorted_inplace; puts ""
   bm.report('Insertion Sort') { insertion_sorted = insertion_sort(Array.new(to_sort)) }
   print insertion_sorted; puts ""
-=end
-
-print split(Array.new(to_sort))
+  bm.report('Merge Sort') { merge_sorted = merge_sort(Array.new(to_sort)) }
+  print merge_sorted; puts ""
+end
