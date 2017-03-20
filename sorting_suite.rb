@@ -3,29 +3,7 @@
 require 'pry'
 require 'benchmark'
 
-class String # This is so cool! Dangerous I think, but cool
-
-  def plus(array)
-    [self]+array
-  end  
-
-end
-
-class Fixnum # Added this so merge sort can do both nums and chars. Fun, but totaly not needed.
-
-  def plus(array)
-    [self]+array
-  end
-
-end
-
-class Array # What I think unshift should be called!
-
-  def promote(string)
-    self.unshift(string)
-  end
-
-end
+# Bubble Sort
 
 class BubbleSort
     
@@ -58,35 +36,62 @@ class BubbleSort
 
 end
 
-class InsertionSort
+# Insertion Sort
 
-  attr_reader :set
+class InsertionSortStable
+
+  attr_reader :set, :copy, :sorted
 
   def initialize(set)
     @set = set
+    @copy = Array.new(set)
+    @sorted = []
   end
 
   def sort
-    sorted = []
 
-    until set.empty?
+    until sorted.length == set.length
       i = 0
       
       loop do
-        if sorted.empty? || i == sorted.length || set[0] <= sorted[i]
-          sorted.insert(i, set[0])
+        if sorted.empty? || i == sorted.length || copy[0] <= sorted[i]
+          sorted.insert(i, copy[0])
           break
         end
 
         i+=1
       end
 
-      set.shift
+      copy.shift
     end
-
-    @set = sorted
   end
 end
+
+class InsertionSortInplace
+
+  attr_accessor :set
+
+  def initialize(set)
+    @set = set
+  end
+
+  def sort
+
+     (1..set.length-1).each do |i|
+      check = set.slice!(i)
+      index = i
+  
+      until index == 0 || check > set[index-1] do # Ah!
+        index-=1
+      end 
+        
+        set.insert(index, check)
+    end
+  end
+
+end
+
+# Merge Sort
 
 class MergeSort
 
@@ -111,22 +116,27 @@ class MergeSort
     end
   end
 
-  def merge(front, back)
+  def merge_recursive(front, back) # Throws a "stack too deep" error on nums > ~15000
     if front.empty?
       back
     elsif back.empty?
       front
     elsif front.first <= back.first
-      #front.first.plus(merge(front.drop(1), back))      # Just playing with around with syntax here
-      merge(front.drop(1), back).unshift(front.first)
-      #[front.first] + merge(front.drop(1), back)         # Probably the best way
+      [front.first] + merge(front.drop(1), back)
     elsif back.first <= front.first
-      #back.first.plus(merge(back.drop(1), front))
-      merge(back.drop(1), front).unshift(back.first)
-      #[back.first] + merge(back.drop(1), front)
+      [back.first] + merge(back.drop(1), front)
     end
   end
 
+  def merge(front, back) # Instead of calling merge again just fills new array as it checks firsts of front/back 
+    sorted = []
+
+    until front.empty? || back.empty?
+      front.first <= back.first ? sorted << front.slice!(0) : sorted << back.slice!(0)
+    end
+
+    sorted + front + back
+  end
 end
 
 # Test Proofs and Benchmarks
@@ -137,20 +147,23 @@ set_size = 20
 chars_to_sort = []
 set_size.times { chars_to_sort << ("a".."z").to_a.sample }
 
-puts "\nCharacters To Sort"
-#print chars_to_sort; puts"\n\n"
+puts "\nCharacters Sort"
+print chars_to_sort; puts"\n\n"
 
 bubble_sorted = BubbleSort.new(Array.new(chars_to_sort))
-insertion_sorted = InsertionSort.new(Array.new(chars_to_sort))
+insertion_sorted_stable = InsertionSortStable.new(Array.new(chars_to_sort))
+insertion_sorted_inplace = InsertionSortInplace.new(Array.new(chars_to_sort))
 merge_sorted = MergeSort.new(Array.new(chars_to_sort))
 
-Benchmark.bm(20) do |bm|
+Benchmark.bm(25) do |bm|
   bm.report('Bubble Sort') { bubble_sorted.sort }
-  #print bubble_sorted.set; puts""
-  bm.report('Insertion Sort') { insertion_sorted.sort }
-  #print insertion_sorted.set; puts""
+  print bubble_sorted.set; puts""
+  bm.report('Insertion Sort Stable') { insertion_sorted_stable.sort }
+  print insertion_sorted_stable.sorted; puts""
+  bm.report('Insertion Sort Inplace') { insertion_sorted_inplace.sort }
+  print insertion_sorted_inplace.set; puts""
   bm.report('Merge Sort') { merge_sorted.sort }
-  #print merge_sorted.set; puts""
+  print merge_sorted.set; puts""
 end
 
 # Sorting Numbers
@@ -158,19 +171,24 @@ end
 nums_to_sort = []
 set_size.times { nums_to_sort << rand(0..100) }
 
-puts "\n\nNumbers To Sort"
-#print nums_to_sort; puts"\n\n"
+puts "\n\nNumbers Sort"
+print nums_to_sort; puts"\n\n"
 
 bubble_sorted = BubbleSort.new(Array.new(nums_to_sort))
-insertion_sorted = InsertionSort.new(Array.new(nums_to_sort))
+insertion_sorted_stable = InsertionSortStable.new(Array.new(nums_to_sort))
+insertion_sorted_inplace = InsertionSortInplace.new(Array.new(nums_to_sort))
 merge_sorted = MergeSort.new(Array.new(nums_to_sort))
 
-Benchmark.bm(20) do |bm|
+Benchmark.bm(25) do |bm|
   bm.report('Bubble Sort') { bubble_sorted.sort }
-  #print bubble_sorted.set; puts""
-  bm.report('Insertion Sort') { insertion_sorted.sort }
-  #print insertion_sorted.set; puts""
+  print bubble_sorted.set; puts""
+  bm.report('Insertion Sort Stable') { insertion_sorted_stable.sort }
+  print insertion_sorted_stable.set; puts""
+  print insertion_sorted_stable.sorted; puts""
+  bm.report('Insertion Sort Inplace') { insertion_sorted_inplace.sort }
+  print insertion_sorted_inplace.set; puts""
   bm.report('Merge Sort') { merge_sorted.sort }
-  #print merge_sorted.set; puts""
+  print merge_sorted.set; puts""
 end
 
+puts "\n"
