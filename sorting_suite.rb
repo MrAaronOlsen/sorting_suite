@@ -77,7 +77,7 @@ class InsertionSortInplace
 
   def sort
 
-     (1..set.length-1).each do |i|
+    (1..set.length-1).each do |i|
       check = set.slice!(i)
       index = i
   
@@ -85,7 +85,7 @@ class InsertionSortInplace
         index-=1
       end 
         
-        set.insert(index, check)
+      set.insert(index, check)
     end
   end
 
@@ -116,19 +116,7 @@ class MergeSort
     end
   end
 
-  def merge_recursive(front, back) # Throws a "stack too deep" error on nums > ~15000
-    if front.empty?
-      back
-    elsif back.empty?
-      front
-    elsif front.first <= back.first
-      [front.first] + merge(front.drop(1), back)
-    elsif back.first <= front.first
-      [back.first] + merge(back.drop(1), front)
-    end
-  end
-
-  def merge(front, back) # Instead of calling merge again just fills new array as it checks firsts of front/back 
+  def merge(front, back) 
     sorted = []
 
     until front.empty? || back.empty?
